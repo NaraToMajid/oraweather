@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORAWEATHER - Aplikasi Cuaca Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-cloud-sun"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>ORAWEATHER</h1>
+                    <p class="tagline">Informasi cuaca terkini dengan akurasi tinggi</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main App Container -->
+        <main class="app-container">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="cityInput" placeholder="Cari kota (Jakarta, Bandung, dll)">
+                        <button id="searchBtn" class="search-btn">
+                            <i class="fas fa-search-location"></i>
+                            <span>Cari</span>
+                        </button>
+                    </div>
+                    
+                    <div class="location-display">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="currentLocation">Jakarta, Indonesia</span>
+                    </div>
+                    
+                    <div class="unit-toggle">
+                        <button id="celsiusBtn" class="unit-btn active">
+                            <span>°C</span>
+                            <span class="unit-label">Celcius</span>
+                        </button>
+                        <button id="fahrenheitBtn" class="unit-btn">
+                            <span>°F</span>
+                            <span class="unit-label">Fahrenheit</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weather Content -->
+            <div id="weatherContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Memuat data cuaca...</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="creator">Dibuat dengan <i class="fas fa-heart"></i> oleh</p>
+                <p class="brand">ALMAJID - ORADEV</p>
+                <p class="update-info">Data diperbarui setiap 15 menit</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
