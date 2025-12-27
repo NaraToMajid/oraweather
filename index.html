@@ -5,14 +5,765 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ORAWEATHER - Aplikasi Cuaca Premium</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111a;
+            --glass-bg: rgba(20, 20, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.05);
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.3);
+            --gradient-bg: radial-gradient(ellipse at top, #1a1a2e, #0a0a0f);
+            --gradient-card: linear-gradient(145deg, rgba(30, 30, 46, 0.8), rgba(15, 15, 25, 0.9));
+            --gradient-accent: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+        }
+        
+        body {
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        /* Header Styles */
+        .header {
+            text-align: center;
+            padding: 40px 0 50px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: var(--gradient-accent);
+            border-radius: 3px;
+        }
+        
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            color: var(--accent-cyan);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 0 30px rgba(59, 130, 246, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logo-text h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+        }
+        
+        .logo-text h1::after {
+            content: 'ORAWEATHER';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            background: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            z-index: -1;
+            filter: blur(8px);
+            opacity: 0.6;
+        }
+        
+        .tagline {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        
+        /* Main App Container */
+        .app-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 40px;
+        }
+        
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                rgba(59, 130, 246, 0.3), 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+        }
+        
+        /* Search Section */
+        .search-section {
+            padding: 40px;
+            position: relative;
+            background: rgba(10, 10, 15, 0.5);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .search-box {
+            display: flex;
+            background: var(--secondary-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .search-box:focus-within {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), var(--shadow-md);
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 22px 30px;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            outline: none;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+        
+        .search-btn {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: 0 40px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .search-btn:hover::before {
+            left: 100%;
+        }
+        
+        .search-btn:hover {
+            padding-right: 45px;
+        }
+        
+        .location-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 25px auto 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .location-display i {
+            color: var(--accent-cyan);
+            font-size: 1.3rem;
+        }
+        
+        .unit-toggle {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 10px;
+        }
+        
+        .unit-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+            padding: 12px 35px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .unit-btn.active {
+            background: var(--gradient-accent);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Weather Display */
+        .weather-display {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        @media (max-width: 1100px) {
+            .weather-display {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Current Weather Card */
+        .current-weather-card {
+            background: var(--gradient-card);
+            border-radius: 25px;
+            padding: 40px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .current-weather-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        }
+        
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .weather-icon-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .weather-icon {
+            font-size: 6rem;
+            color: var(--accent-cyan);
+            filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.5));
+            z-index: 2;
+        }
+        
+        .weather-icon-bg {
+            position: absolute;
+            font-size: 12rem;
+            color: rgba(255, 255, 255, 0.03);
+            z-index: 1;
+        }
+        
+        .temp-display {
+            text-align: right;
+        }
+        
+        .current-temp {
+            font-size: 5.5rem;
+            font-weight: 300;
+            background: linear-gradient(to bottom, #ffffff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        
+        .temp-unit {
+            font-size: 2.5rem;
+            vertical-align: top;
+            color: var(--text-secondary);
+        }
+        
+        .weather-condition {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .feels-like {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        .weather-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+        }
+        
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-info p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Forecast Section */
+        .forecast-section {
+            padding: 40px;
+            background: rgba(10, 10, 15, 0.5);
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-title i {
+            color: var(--accent-cyan);
+        }
+        
+        .forecast-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+        }
+        
+        .forecast-card {
+            background: var(--gradient-card);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .forecast-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .forecast-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-accent);
+        }
+        
+        .forecast-date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .forecast-day {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .forecast-date-num {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+        }
+        
+        .forecast-icon {
+            text-align: center;
+            font-size: 3.5rem;
+            margin: 15px 0;
+            color: var(--accent-cyan);
+        }
+        
+        .forecast-condition {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        
+        .forecast-temps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .temp-high, .temp-low {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .temp-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .temp-high .temp-value {
+            color: #ff6b6b;
+        }
+        
+        .temp-low .temp-value {
+            color: var(--accent-cyan);
+        }
+        
+        .temp-label {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            margin-top: 5px;
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 80px 40px;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Error State */
+        .error-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(239, 68, 68, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            margin: 20px;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        
+        .error-title {
+            font-size: 1.8rem;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        
+        .error-message {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        
+        .retry-btn {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            font-weight: 400;
+            position: relative;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        }
+        
+        .creator {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .brand {
+            font-size: 1.3rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 0 40px;
+            }
+            
+            .logo-text h1 {
+                font-size: 2.8rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+                padding: 0 20px;
+            }
+            
+            .search-section, .weather-display, .forecast-section {
+                padding: 30px 20px;
+            }
+            
+            .current-temp {
+                font-size: 4rem;
+            }
+            
+            .weather-main {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .temp-display {
+                text-align: center;
+            }
+            
+            .weather-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .forecast-cards {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .search-box {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+            
+            .search-box input, .search-btn {
+                width: 100%;
+                border-radius: 0;
+                padding: 20px;
+            }
+            
+            .search-btn {
+                justify-content: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+        
+        /* Animation for weather cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .weather-display > *, .forecast-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .forecast-card:nth-child(2) { animation-delay: 0.1s; }
+        .forecast-card:nth-child(3) { animation-delay: 0.2s; }
+        .forecast-card:nth-child(4) { animation-delay: 0.3s; }
+        .forecast-card:nth-child(5) { animation-delay: 0.4s; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Section -->
         <header class="header">
             <div class="logo-container">
                 <div class="logo-icon">
@@ -20,22 +771,19 @@
                 </div>
                 <div class="logo-text">
                     <h1>ORAWEATHER</h1>
-                    <p class="tagline">Informasi cuaca terkini dengan akurasi tinggi</p>
+                    <p class="tagline">Dapatkan informasi cuaca terkini untuk lokasi mana pun di dunia dengan akurasi tinggi</p>
                 </div>
             </div>
         </header>
-
-        <!-- Main App Container -->
+        
         <main class="app-container">
-            <!-- Search Section -->
             <section class="search-section">
                 <div class="search-container">
                     <div class="search-box">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="cityInput" placeholder="Cari kota (Jakarta, Bandung, dll)">
+                        <input type="text" id="cityInput" placeholder="Masukkan nama kota (contoh: Jakarta, Bandung, Surabaya)">
                         <button id="searchBtn" class="search-btn">
-                            <i class="fas fa-search-location"></i>
-                            <span>Cari</span>
+                            <i class="fas fa-search"></i>
+                            <span>Cari Cuaca</span>
                         </button>
                     </div>
                     
@@ -46,36 +794,442 @@
                     
                     <div class="unit-toggle">
                         <button id="celsiusBtn" class="unit-btn active">
+                            <i class="fas fa-thermometer-half"></i>
                             <span>°C</span>
-                            <span class="unit-label">Celcius</span>
                         </button>
                         <button id="fahrenheitBtn" class="unit-btn">
+                            <i class="fas fa-thermometer-full"></i>
                             <span>°F</span>
-                            <span class="unit-label">Fahrenheit</span>
                         </button>
                     </div>
                 </div>
             </section>
-
-            <!-- Weather Content -->
+            
             <div id="weatherContent">
+                <!-- Konten cuaca akan dimuat di sini -->
                 <div class="loading">
                     <div class="loading-spinner"></div>
                     <p class="loading-text">Memuat data cuaca...</p>
                 </div>
             </div>
         </main>
-
-        <!-- Footer -->
+        
         <footer class="footer">
-            <div class="footer-content">
-                <p class="creator">Dibuat dengan <i class="fas fa-heart"></i> oleh</p>
-                <p class="brand">ALMAJID - ORADEV</p>
-                <p class="update-info">Data diperbarui setiap 15 menit</p>
-            </div>
+            <p class="creator">Dibuat dengan <i class="fas fa-heart" style="color:#ef4444;"></i> oleh</p>
+            <p class="brand">ALMAJID - ORADEV</p>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Konfigurasi API
+        const API_KEY = '8f4b732d02c14a9d89762031252712';
+        const BASE_URL = 'https://api.weatherapi.com/v1';
+        
+        // Elemen DOM
+        const cityInput = document.getElementById('cityInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const currentLocation = document.getElementById('currentLocation');
+        const weatherContent = document.getElementById('weatherContent');
+        const celsiusBtn = document.getElementById('celsiusBtn');
+        const fahrenheitBtn = document.getElementById('fahrenheitBtn');
+        
+        // State aplikasi
+        let currentUnit = 'c';
+        let currentWeatherData = null;
+        
+        // Event Listeners
+        searchBtn.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (city) {
+                getWeatherData(city);
+            } else {
+                showError('Silakan masukkan nama kota');
+            }
+        });
+        
+        cityInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+        
+        celsiusBtn.addEventListener('click', () => {
+            if (currentUnit !== 'c') {
+                setUnit('c');
+            }
+        });
+        
+        fahrenheitBtn.addEventListener('click', () => {
+            if (currentUnit !== 'f') {
+                setUnit('f');
+            }
+        });
+        
+        // Fungsi untuk mengatur unit suhu
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            if (unit === 'c') {
+                celsiusBtn.classList.add('active');
+                fahrenheitBtn.classList.remove('active');
+            } else {
+                celsiusBtn.classList.remove('active');
+                fahrenheitBtn.classList.add('active');
+            }
+            
+            if (currentWeatherData) {
+                renderWeatherData(currentWeatherData);
+            }
+        }
+        
+        // Fungsi untuk mendapatkan data cuaca
+        async function getWeatherData(city) {
+            try {
+                // Tampilkan loading state
+                weatherContent.innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-text">Mencari data cuaca untuk ${city}...</p>
+                    </div>
+                `;
+                
+                // Fetch data dari API
+                const response = await fetch(
+                    `${BASE_URL}/forecast.json?key=${API_KEY}&q=${encodeURIComponent(city)}&days=5&aqi=no&alerts=no`
+                );
+                
+                if (!response.ok) {
+                    if (response.status === 400) {
+                        throw new Error('Kota tidak ditemukan. Silakan coba dengan nama kota lain.');
+                    } else if (response.status === 403) {
+                        throw new Error('Akses API terbatas. Silakan coba lagi nanti.');
+                    } else {
+                        throw new Error('Terjadi kesalahan jaringan. Periksa koneksi internet Anda.');
+                    }
+                }
+                
+                const data = await response.json();
+                currentWeatherData = data;
+                
+                // Render data cuaca
+                renderWeatherData(data);
+                
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                showError(error.message);
+            }
+        }
+        
+        // Fungsi untuk menampilkan error
+        function showError(message) {
+            weatherContent.innerHTML = `
+                <div class="error-container">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="error-title">Terjadi Kesalahan</h3>
+                    <p class="error-message">${message}</p>
+                    <button onclick="getWeatherData('Jakarta')" class="retry-btn">
+                        <i class="fas fa-redo"></i>
+                        <span>Coba Jakarta</span>
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Fungsi untuk merender data cuaca
+        function renderWeatherData(data) {
+            const { location, current, forecast } = data;
+            
+            // Update lokasi saat ini
+            currentLocation.textContent = `${location.name}, ${location.country}`;
+            
+            // Tentukan unit suhu
+            const tempUnit = currentUnit === 'c' ? '°C' : '°F';
+            const tempValue = currentUnit === 'c' ? current.temp_c : current.temp_f;
+            const feelsLikeValue = currentUnit === 'c' ? current.feelslike_c : current.feelslike_f;
+            const windUnit = currentUnit === 'c' ? 'km/jam' : 'mil/jam';
+            const windValue = currentUnit === 'c' ? current.wind_kph : current.wind_mph;
+            const visibilityUnit = currentUnit === 'c' ? 'km' : 'mil';
+            const visibilityValue = currentUnit === 'c' ? current.vis_km : current.vis_miles;
+            
+            // Dapatkan ikon cuaca
+            const weatherIcon = getWeatherIcon(current.condition.code, current.is_day);
+            
+            // Format waktu lokal
+            const localTime = new Date(location.localtime);
+            const timeString = localTime.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            const dateString = localTime.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Buat HTML untuk cuaca saat ini
+            const currentWeatherHTML = `
+                <div class="weather-display">
+                    <div class="current-weather-card">
+                        <div class="weather-main">
+                            <div class="weather-icon-container">
+                                <i class="weather-icon-bg ${weatherIcon}"></i>
+                                <i class="weather-icon ${weatherIcon}"></i>
+                            </div>
+                            <div class="temp-display">
+                                <div class="current-temp">${Math.round(tempValue)}<span class="temp-unit">${tempUnit}</span></div>
+                                <div class="weather-condition">${current.condition.text}</div>
+                                <div class="feels-like">Terasa seperti ${Math.round(feelsLikeValue)}${tempUnit}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="time-info" style="color: var(--text-tertiary); margin-bottom: 20px; font-size: 0.95rem;">
+                            <i class="fas fa-clock"></i> ${timeString} • ${dateString}
+                        </div>
+                        
+                        <div class="weather-stats">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-wind"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Kecepatan Angin</h3>
+                                    <p>${windValue} ${windUnit}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Kelembaban</h3>
+                                    <p>${current.humidity}%</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-compress-alt"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Tekanan Udara</h3>
+                                    <p>${current.pressure_mb} mb</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Jarak Pandang</h3>
+                                    <p>${visibilityValue} ${visibilityUnit}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="current-weather-card">
+                        <h2 class="section-title" style="margin-bottom: 25px;">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Informasi Tambahan</span>
+                        </h2>
+                        
+                        <div class="weather-stats">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-sun"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>UV Index</h3>
+                                    <p>${current.uv}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-cloud-rain"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Presipitasi</h3>
+                                    <p>${current.precip_mm} mm</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-temperature-high"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Suhu Maks</h3>
+                                    <p>${currentUnit === 'c' ? Math.round(forecast.forecastday[0].day.maxtemp_c) : Math.round(forecast.forecastday[0].day.maxtemp_f)}${tempUnit}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-temperature-low"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Suhu Min</h3>
+                                    <p>${currentUnit === 'c' ? Math.round(forecast.forecastday[0].day.mintemp_c) : Math.round(forecast.forecastday[0].day.mintemp_f)}${tempUnit}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.03); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                            <h3 style="color: var(--text-secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-sunrise" style="color: #f59e0b;"></i>
+                                <span>Waktu Matahari</span>
+                            </h3>
+                            <div style="display: flex; justify-content: space-between;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.3rem; font-weight: 600; color: var(--text-primary);">${forecast.forecastday[0].astro.sunrise}</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-tertiary);">Terbit</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.3rem; font-weight: 600; color: var(--text-primary);">${forecast.forecastday[0].astro.sunset}</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-tertiary);">Terbenam</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Buat HTML untuk ramalan cuaca
+            let forecastHTML = '';
+            forecast.forecastday.forEach((day, index) => {
+                const date = new Date(day.date);
+                const dayName = date.toLocaleDateString('id-ID', { weekday: 'long' });
+                const formattedDate = `${date.getDate()} ${date.toLocaleDateString('id-ID', { month: 'short' })}`;
+                const forecastIcon = getWeatherIcon(day.day.condition.code, 1);
+                const maxTemp = currentUnit === 'c' ? day.day.maxtemp_c : day.day.maxtemp_f;
+                const minTemp = currentUnit === 'c' ? day.day.mintemp_c : day.day.mintemp_f;
+                
+                forecastHTML += `
+                    <div class="forecast-card">
+                        <div class="forecast-date">
+                            <div class="forecast-day">${index === 0 ? 'HARI INI' : dayName.toUpperCase()}</div>
+                            <div class="forecast-date-num">${formattedDate}</div>
+                        </div>
+                        
+                        <div class="forecast-icon">
+                            <i class="${forecastIcon}"></i>
+                        </div>
+                        
+                        <div class="forecast-condition">
+                            ${day.day.condition.text}
+                        </div>
+                        
+                        <div class="forecast-temps">
+                            <div class="temp-high">
+                                <div class="temp-value">${Math.round(maxTemp)}${tempUnit}</div>
+                                <div class="temp-label">Maks</div>
+                            </div>
+                            
+                            <div class="temp-low">
+                                <div class="temp-value">${Math.round(minTemp)}${tempUnit}</div>
+                                <div class="temp-label">Min</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Gabungkan semua HTML
+            weatherContent.innerHTML = `
+                ${currentWeatherHTML}
+                <section class="forecast-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Ramalan 5 Hari ke Depan</span>
+                    </h2>
+                    <div class="forecast-cards">
+                        ${forecastHTML}
+                    </div>
+                </section>
+            `;
+        }
+        
+        // Fungsi untuk mendapatkan ikon cuaca
+        function getWeatherIcon(code, isDay) {
+            // Mapping kode kondisi WeatherAPI ke ikon FontAwesome
+            const iconMap = {
+                1000: isDay ? 'fas fa-sun' : 'fas fa-moon',
+                1003: isDay ? 'fas fa-cloud-sun' : 'fas fa-cloud-moon',
+                1006: 'fas fa-cloud',
+                1009: 'fas fa-cloud',
+                1030: 'fas fa-smog',
+                1063: 'fas fa-cloud-rain',
+                1066: 'fas fa-snowflake',
+                1069: 'fas fa-cloud-meatball',
+                1087: 'fas fa-bolt',
+                1114: 'fas fa-wind',
+                1117: 'fas fa-snowflake',
+                1135: 'fas fa-smog',
+                1147: 'fas fa-smog',
+                1150: 'fas fa-cloud-rain',
+                1153: 'fas fa-cloud-rain',
+                1168: 'fas fa-icicles',
+                1171: 'fas fa-icicles',
+                1180: 'fas fa-cloud-rain',
+                1183: 'fas fa-cloud-rain',
+                1186: 'fas fa-cloud-showers-heavy',
+                1189: 'fas fa-cloud-showers-heavy',
+                1192: 'fas fa-cloud-showers-heavy',
+                1195: 'fas fa-cloud-showers-heavy',
+                1198: 'fas fa-icicles',
+                1201: 'fas fa-icicles',
+                1204: 'fas fa-cloud-meatball',
+                1207: 'fas fa-cloud-meatball',
+                1210: 'fas fa-snowflake',
+                1213: 'fas fa-snowflake',
+                1216: 'fas fa-snowflake',
+                1219: 'fas fa-snowflake',
+                1222: 'fas fa-snowflake',
+                1225: 'fas fa-snowflake',
+                1237: 'fas fa-cloud-meatball',
+                1240: 'fas fa-cloud-rain',
+                1243: 'fas fa-cloud-showers-heavy',
+                1246: 'fas fa-cloud-showers-heavy',
+                1249: 'fas fa-cloud-meatball',
+                1252: 'fas fa-cloud-meatball',
+                1255: 'fas fa-snowflake',
+                1258: 'fas fa-snowflake',
+                1261: 'fas fa-cloud-meatball',
+                1264: 'fas fa-cloud-meatball',
+                1273: 'fas fa-bolt',
+                1276: 'fas fa-poo-storm',
+                1279: 'fas fa-snowflake',
+                1282: 'fas fa-snowflake'
+            };
+            
+            return iconMap[code] || (isDay ? 'fas fa-sun' : 'fas fa-moon');
+        }
+        
+        // Inisialisasi dengan cuaca Jakarta
+        window.onload = function() {
+            getWeatherData('Jakarta');
+            
+            // Fokus pada input pencarian
+            setTimeout(() => {
+                cityInput.focus();
+            }, 800);
+        };
+        
+        // Tambahkan efek ketik untuk input
+        cityInput.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                this.style.color = 'var(--text-primary)';
+            } else {
+                this.style.color = '';
+            }
+        });
+    </script>
 </body>
 </html>
